@@ -10,7 +10,7 @@ from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
 
 # Create your views here.
-
+@unauthenticated_user
 def registerPage(request):
 
 	form = CreateUserForm()
@@ -61,9 +61,11 @@ def home(request):
 	 'total_orders':total_orders, 'delivered':delivered, 'pending':pending}
 	return render(request, "accounts/dashbord.html", context)
 
-
+@login_required(login_url = 'login')
+@allowed_users(allowed_roles = ['customer'])
 def userPage(request):
-	context = {}
+	orders = request.user.customer.order_set.all()
+	context = {'orders':orders}
 	return render(request, "accounts/user.html", context)
 
 @login_required(login_url = 'login')
